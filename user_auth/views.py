@@ -7,6 +7,9 @@ from django.db import IntegrityError
 from bs4 import BeautifulSoup
 from .models import Client
 from .forms import reg_form
+from captive_portal import settings
+from datetime import datetime
+import pytz
 
 
 def home(request):
@@ -17,7 +20,23 @@ def home(request):
         record_obj = get_object_or_404(Client, user=request.user)
         plan = record_obj.plan
         p_time = record_obj.paid_time
-        return render(request, 'user_auth/home.html', {'plan': plan, 'p_time': p_time})
+        l_time = record_obj.last_time
+        u_time = record_obj.user_time
+        calc_time = (datetime.utcnow().replace(tzinfo=pytz.UTC) - l_time).seconds
+        updated_utime = u_time + calc_time
+        timeauth = True if updated_utime <= p_time else False
+        if 0 < p_time <= 600:
+            time_user = 'test'
+        elif 600 < p_time <= 3600:
+            time_user = 'standard'
+        else:
+            time_user = 'invalid'
+        if calc_time > 0:
+            record_obj.user_time = updated_utime
+            record_obj.save()
+        return render(request, 'user_auth/home.html', {'plan': plan, 'p_time': p_time, 'time_user': time_user,
+                                                       'nds_ip': settings.NDS_IP, 'nds_port': settings.NDS_PORT,
+                                                       'u_time': updated_utime, 'timeauth': timeauth})
     else:
         return render(request, 'user_auth/home.html')
 
@@ -64,7 +83,11 @@ def register_user(request):
         form_obj = reg_form(request.POST)
         if form_obj.is_valid():
             user_plan = get_selected(form_obj['plan'])
-            Client(full_name=form_obj['full_name'], plan=user_plan, user=request.user).save()
+            if user_plan == 'test':
+                ptime = 600
+            else:
+                ptime = 3600
+            Client(full_name=form_obj['full_name'], plan=user_plan, user=request.user, paid_time=ptime).save()
             if user_plan == 'paid':
                 return redirect('user_auth:p_portal')
             else:

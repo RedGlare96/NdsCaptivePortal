@@ -11,10 +11,18 @@
       <p>You are logged in as {{ user.username }}</p>
       <p>You are currently subscribed to the plan: {{ plan }}</p>
       <p>Total time: {{ p_time }}</p>
+      <p>Time elapsed: {{ u_time }}</p>
     </div>
+    {% if timeauth %}
     <div class="row pt-1">
-      <a href="http://ndip:ndport/nodogsplash_auth/?tok={{ request.session.tok }}&redir={{ request.session.redir }}&time={{ p_time }}"><button type="button" class="btn btn-primary">Begin browsing</button></a>
+      <a href="http://{{ nds_ip }}:{{ nds_port }}/nodogsplash_auth/?tok={{ request.session.tok }}&redir={{ request.session.redir }}&username={{ time_user }}&password=placeholder"><button type="button" class="btn btn-primary">
+        Begin browsing</button></a>
     </div>
+    {% else %}
+    <div class="row pt-1">
+      <p>You have run out of available time</p>
+    </div>
+    {% endif %}
     {% else %}
     <div class="row pt-5">
       <p>You are not logged in</p>
