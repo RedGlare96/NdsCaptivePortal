@@ -1,0 +1,29 @@
+{% extends 'user_auth/base.html' %}
+{% block content %}
+  <div class="container text-center pt-5">
+    <!--
+    <p>{{ request.session.tok }}</p>
+    <p>{{ request.session.redir }}</p>
+    -->
+    <h1>Welcome to captive portal</h1>
+    {% if user.is_authenticated %}
+    <div class="row pt-2">
+      <p>You are logged in as {{ user.username }}</p>
+      <p>You are currently subscribed to the plan: {{ plan }}</p>
+      <p>Total time: {{ p_time }}</p>
+    </div>
+    <div class="row pt-1">
+      <a href="http://ndip:ndport/nodogsplash_auth/?tok={{ request.session.tok }}&redir={{ request.session.redir }}&time={{ p_time }}"><button type="button" class="btn btn-primary">Begin browsing</button></a>
+    </div>
+    {% else %}
+    <div class="row pt-5">
+      <p>You are not logged in</p>
+    </div>
+    <div class="row pt-5">
+      <div class="col pl-0.1 align-center">
+        <a href="{% url 'two_factor:login' %}"><button type="button" class="btn btn-primary">Log in</button></a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}
