@@ -25,10 +25,14 @@ def home(request):
         calc_time = (datetime.utcnow().replace(tzinfo=pytz.UTC) - l_time).seconds
         updated_utime = u_time + calc_time
         timeauth = True if updated_utime <= p_time else False
-        if 0 < p_time <= 600:
+        if p_time == 600:
             time_user = 'test'
-        elif 600 < p_time <= 3600:
+        elif p_time == 3600:
             time_user = 'standard'
+        elif p_time == 86400:
+            time_user = 'paid1'
+        elif p_time == 172800:
+            time_user = 'paid2'
         else:
             time_user = 'invalid'
         if calc_time > 0:
@@ -57,20 +61,6 @@ def signupuser(request):
         else:
             return render(request, 'user_auth/signup.html', {'form': UserCreationForm, 'errormessage': 'The passwords do not match'})
 
-'''
-def loginuser(request):
-    if request.method == 'GET':
-        return render(request, 'user_auth/login.html', {'form': AuthenticationTokenForm})
-    elif request.method == 'POST':
-        user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
-        if user is None:
-            return render(request, 'user_auth/login.html', {'form': AuthenticationTokenForm,
-                                                           'errormessage': 'The username and password do not match'})
-        else:
-            login(request, user)
-            return redirect('user_auth:home')
-'''
-
 
 def get_selected(tar_html):
     return BeautifulSoup(str(tar_html), 'html.parser').find('option', selected=True)['value']
@@ -95,9 +85,21 @@ def register_user(request):
 
 
 def payment_portal(request):
-    tok = request.session['tok']
-    redir = request.session['redir']
-    return render(request, 'user_auth/p_portal.html', {'tok': tok, 'redir': redir})
+    if request.method == 'GET':
+        return render(request, 'user_auth/p_portal.html')
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            record_obj = get_object_or_404(Client, user=request.user)
+            pkey = request.POST.get('pkey')
+            if pkey == '1':
+                record_obj.paid_time = 86400
+            elif pkey == '2':
+                record_obj.paid_time = 172800
+            record_obj.user_time = 0
+            record_obj.save()
+            return render(request, 'user_auth/p_portal.html', {'not_message': 'Plan changes saved'})
+        else:
+            return render(request, 'user_auth/p_portal.html', {'errormessage': 'Invalid user'})
 
 
 def logoutuser(request):

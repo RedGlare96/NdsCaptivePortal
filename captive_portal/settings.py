@@ -134,6 +134,6 @@ TWO_FACTOR_SMS_GATEWAY = 'two_factor.gateways.twilio.gateway.Twilio'
 TWILIO_ACCOUNT_SID = 'redacted'
 TWILIO_AUTH_TOKEN = 'redacted'
 TWILIO_CALLER_ID = 'redacted'
-# TWO_FACTOR_REMEMBER_COOKIE_AGE = 1
+TWO_FACTOR_REMEMBER_COOKIE_AGE = 1
 NDS_IP = 'ndsip'
 NDS_PORT = 'ndsport'

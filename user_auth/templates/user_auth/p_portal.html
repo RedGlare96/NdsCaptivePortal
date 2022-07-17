@@ -1,11 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Payment portal</title>
-</head>
-<body>
-<h1>Payment portal goes here</h1>
-<a href="{% url 'user_auth:home' %}?tok={{ tok }}&redir={{ redir }}"><button>Go to home</button></a>
-</body>
-</html>
+{% extends 'user_auth/base.html' %}
+{% block content %}
+<div class="container">
+     {% if not_message %}
+       <div class="alert alert-primary" role="alert">
+        {{ not_message }}
+       </div>
+    {% endif %}
+</div>
+<div class="container">
+     {% if errormessage %}
+       <div class="alert alert-danger" role="alert">
+        {{ errormessage }}
+       </div>
+    {% endif %}
+</div>
+<div class="container">
+    <h1>Choose your plan</h1>
+    <br>
+    <br>
+    <a href="#"><button>Proceed to payment</button></a>
+    <br>
+    <br>
+    <h4>or</h4>
+    <br>
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="pkey">Enter product key:</label><br>
+        <input type="text" id="pkey" name="pkey">
+        <input type="submit" value="Submit">
+    </form>
+    <br>
+    <br>
+    <a href="{% url 'user_auth:home' %}"><button>Proceed to internet access</button></a>
+</div>
+{% endblock %}

@@ -21,6 +21,8 @@
     {% else %}
     <div class="row pt-1">
       <p>You have run out of available time</p>
+      <br>
+      <a href="{% url 'user_auth:p_portal' %}">Recharge plan</a>
     </div>
     {% endif %}
     {% else %}
