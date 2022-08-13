@@ -5,7 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from bs4 import BeautifulSoup
-from .models import Client
+from .models import Client, PlanVoucher
 from .forms import reg_form
 from captive_portal import settings
 from datetime import datetime
@@ -29,6 +29,8 @@ def home(request):
             time_user = 'test'
         elif p_time == 3600:
             time_user = 'standard'
+        elif p_time == 7200:
+            time_user = 'standard2'
         elif p_time == 86400:
             time_user = 'paid1'
         elif p_time == 172800:
@@ -90,12 +92,27 @@ def payment_portal(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
             record_obj = get_object_or_404(Client, user=request.user)
-            pkey = request.POST.get('pkey')
-            if pkey == '1':
-                record_obj.paid_time = 86400
-            elif pkey == '2':
-                record_obj.paid_time = 172800
-            record_obj.user_time = 0
+            pcode = request.POST.get('pkey')
+            try:
+                voucherObj = PlanVoucher.objects.get(plan_code=pcode)
+            except Exception as exc:
+                return render(request, 'user_auth/p_portal.html', {'errormessage': str(exc)})
+            if voucherObj.client == record_obj:
+                if not voucherObj.used:
+                    record_obj.plan = voucherObj.plan_name
+                    voucherObj.user = True
+                    if record_obj.user_time > record_obj.paid_time:
+                        record_obj.paid_time = voucherObj.plan_time
+                        record_obj.user_time = 0
+                    else:
+                        record_obj.paid_time += voucherObj.plan_time
+                else:
+                    return render(request, 'user_auth/p_portal.html', {'errormessage':
+                                                                           'This code is already used'})
+            else:
+                return render(request, 'user_auth/p_portal.html', {'errormessage':
+                                                                       'This user is not authorized for this code'})
+            voucherObj.save()
             record_obj.save()
             return render(request, 'user_auth/p_portal.html', {'not_message': 'Plan changes saved'})
         else:

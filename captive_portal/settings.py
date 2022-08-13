@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from . import conf
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%lsnkz=d+^3w%2$r!wlp8zn=vkfr=@6^b5*s_7ok#4ca4%i@jl'
+SECRET_KEY = conf.django_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -131,9 +132,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'user_auth:home'
 LOGIN_URL = 'two_factor:login'
 TWO_FACTOR_SMS_GATEWAY = 'two_factor.gateways.twilio.gateway.Twilio'
-TWILIO_ACCOUNT_SID = 'redacted'
-TWILIO_AUTH_TOKEN = 'redacted'
-TWILIO_CALLER_ID = 'redacted'
+TWILIO_ACCOUNT_SID = conf.TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN = conf.TWILIO_AUTH_TOKEN
+TWILIO_CALLER_ID = conf.TWILIO_CALLER_ID
 TWO_FACTOR_REMEMBER_COOKIE_AGE = 1
-NDS_IP = 'ndsip'
-NDS_PORT = 'ndsport'
+NDS_IP = conf.NDS_IP
+NDS_PORT = conf.NDS_PORT
